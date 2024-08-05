@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://dqqw728e3jirk"]
+
+[ext_resource type="Texture2D" uid="uid://chlemg0bh00vq" path="res://icon.svg" id="1_yovtr"]
+[ext_resource type="Shader" path="res://Raymarcher.gdshader" id="2_6r3xl"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tiyjb"]
+render_priority = 0
+shader = ExtResource("2_6r3xl")
+
+[sub_resource type="QuadMesh" id="QuadMesh_wkjtq"]
+lightmap_size_hint = Vector2i(12, 12)
+material = SubResource("ShaderMaterial_tiyjb")
+flip_faces = true
+size = Vector2(2, 2)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Icon" type="Sprite2D" parent="."]
+position = Vector2(19, 25)
+scale = Vector2(0.046875, 0.046875)
+texture = ExtResource("1_yovtr")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.325)
+fov = 45.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Camera3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.130209, 0.00347281, 0.017271)
+extra_cull_margin = 5461.33
+mesh = SubResource("QuadMesh_wkjtq")
+skeleton = NodePath("../..")
