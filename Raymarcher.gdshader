@@ -1,9 +1,15 @@
 shader_type spatial;
 
+uniform bool lightning = false;
+
 varying vec3 CAMERA_POSITION;
 varying vec3 CAMERA_DIRECTION;
 varying mat4 _CAMERA_MATRIX;
 varying mat4 _INVERSE_PROJECTION;
+
+struct Light {
+	vec3 pos;
+};
 
 void vertex() {
 	
@@ -14,6 +20,7 @@ void vertex() {
 	POSITION = vec4(VERTEX, 1.0);
 	
 }
+
 
 float sd_sphere(vec3 pos, float r) {
 	
@@ -28,6 +35,30 @@ float get_dist(vec3 pos) {
 	return sphere;
 	
 } 
+
+vec3 get_normal(vec3 pos) {
+	
+	
+	float epsilon = 0.01;
+	vec2 epsilonVec = vec2(epsilon, 0.0);
+	
+	float x = get_dist(pos + epsilonVec.xyy);
+	float y = get_dist(pos + epsilonVec.yxy);
+	float z = get_dist(pos + epsilonVec.yyx);
+	
+	return normalize(vec3(x, y, z));
+}
+
+
+
+Light create_light(vec3 pos) {
+	
+	Light light;
+	light.pos = pos;
+	
+	
+	return light;
+}
 
 float RayMarch(vec3 ro, vec3 rd) {
 	
@@ -53,6 +84,18 @@ float RayMarch(vec3 ro, vec3 rd) {
 	
 }
 
+float get_light(vec3 pos, Light light) {
+	
+	vec3 toLight = light.pos - pos;
+	vec3 normal = get_normal(pos);
+	
+	float intensity = dot(normal, normalize(toLight));
+	
+	return intensity;
+}
+
+
+
 void fragment() {
 	
 	vec2 uv = SCREEN_UV;
@@ -71,10 +114,22 @@ void fragment() {
 	if (dist_marched >= max_dist) {
 		discard;
 	}
-	// Called for every pixel the material is visible on.
-	ALBEDO.xyz = vec3(dist_marched * 0.1);
-}
-
-void light() {
 	
+	vec3 rayPos = ro + rd * dist_marched;
+	
+	Light light = create_light(vec3(5.0));
+	
+	
+	
+	vec3 col = vec3(dist_marched * 0.1);
+	
+	vec3 normal = get_normal(rayPos);
+	
+	if (lightning) {
+		float lightIntensity = get_light(rayPos, light);
+		col *= lightIntensity;
+	}
+	col *= vec3(1.0, 0.0, 0.0);
+	// Called for every pixel the material is visible on.
+	ALBEDO.xyz = col;
 }

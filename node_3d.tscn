@@ -21,7 +21,7 @@ scale = Vector2(0.046875, 0.046875)
 texture = ExtResource("1_yovtr")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.325)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.95378)
 fov = 45.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Camera3D"]
