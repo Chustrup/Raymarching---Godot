@@ -1,6 +1,9 @@
 shader_type spatial;
 
-uniform bool lightning = false;
+uniform bool lightning = true;
+uniform bool shadows = true;
+uniform float max_dist = 100.0;
+uniform int max_steps = 100;
 
 varying vec3 CAMERA_POSITION;
 varying vec3 CAMERA_DIRECTION;
@@ -22,17 +25,22 @@ void vertex() {
 }
 
 
-float sd_sphere(vec3 pos, float r) {
+float sd_sphere(vec3 pos, vec3 sphere_pos, float r) {
 	
-	return length(pos) - r;
+	return length(pos - sphere_pos) - r;
 	
+}
+
+float sd_plane(vec3 pos, vec3 plane_pos) {
+	return pos.y - plane_pos.y;
 }
 
 float get_dist(vec3 pos) {
 	
-	float sphere = sd_sphere(pos, 1.0);
+	float sphere = sd_sphere(pos, vec3(sin(TIME * 10.0) * 10.0, 0, 0), 1.0);
+	float plane = sd_plane(pos, vec3(0, -3.0, 0));
 	
-	return sphere;
+	return min(plane, sphere);
 	
 } 
 
@@ -63,9 +71,8 @@ Light create_light(vec3 pos) {
 float RayMarch(vec3 ro, vec3 rd) {
 	
 	float dist_marched = 0.0;
-	const float max_dist = 100.0;
-	const float min_dist = 0.001;
-	for (int i = 0; i < 50; i++) {
+	const float min_dist = 0.0001;
+for (int i = 0; i < max_steps; i++) {
 		
 		vec3 currPos = ro + rd * dist_marched;
 		float currDist = get_dist(currPos);
@@ -94,6 +101,17 @@ float get_light(vec3 pos, Light light) {
 	return intensity;
 }
 
+float get_shadow(vec3 pos, Light light) {
+	
+	vec3 toLight = light.pos - pos;
+	vec3 dir = normalize(toLight);
+	
+	float march = RayMarch(pos, dir);
+	
+	return float(march * march > dot(toLight, toLight));
+	
+}
+
 
 
 void fragment() {
@@ -109,7 +127,6 @@ void fragment() {
 	
 	vec3 ro = CAMERA_POSITION;
 	vec3 rd = rd4;
-	float max_dist = 100.0;
 	float dist_marched = RayMarch(ro, rd);
 	if (dist_marched >= max_dist) {
 		discard;
@@ -128,8 +145,13 @@ void fragment() {
 	if (lightning) {
 		float lightIntensity = get_light(rayPos, light);
 		col *= lightIntensity;
+		
+		if (shadows) {
+			float shadow = get_shadow(rayPos - rd * 0.005, light);
+			col *= shadow;
+		}
 	}
-	col *= vec3(1.0, 0.0, 0.0);
+	col *= vec3(1.0, 1.0, 0.0);
 	// Called for every pixel the material is visible on.
 	ALBEDO.xyz = col;
 }
