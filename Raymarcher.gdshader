@@ -37,24 +37,24 @@ float sd_plane(vec3 pos, vec3 plane_pos) {
 
 float get_dist(vec3 pos) {
 	
-	float sphere = sd_sphere(pos, vec3(sin(TIME * 10.0) * 10.0, 0, 0), 1.0);
+	float sphere = sd_sphere(mod(pos, 1.0) - .5, vec3(0, 0, 0), 0.1);
 	float plane = sd_plane(pos, vec3(0, -3.0, 0));
 	
-	return min(plane, sphere);
+	return sphere;
 	
 } 
 
 vec3 get_normal(vec3 pos) {
-	
-	
-	float epsilon = 0.01;
+	float epsilon = 0.001;
 	vec2 epsilonVec = vec2(epsilon, 0.0);
 	
-	float x = get_dist(pos + epsilonVec.xyy);
-	float y = get_dist(pos + epsilonVec.yxy);
-	float z = get_dist(pos + epsilonVec.yyx);
+	float curr_dist = get_dist(pos);
 	
-	return normalize(vec3(x, y, z));
+	float x = get_dist(pos - epsilonVec.xyy);
+	float y = get_dist(pos - epsilonVec.yxy);
+	float z = get_dist(pos - epsilonVec.yyx);
+	
+	return normalize(curr_dist - vec3(x, y, z));
 }
 
 
