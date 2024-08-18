@@ -9,10 +9,18 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tiyjb"]
 render_priority = 0
 shader = ExtResource("2_6r3xl")
-shader_parameter/lightning = true
-shader_parameter/shadows = true
-shader_parameter/max_dist = 35.32
-shader_parameter/max_steps = 100
+shader_parameter/lightning = false
+shader_parameter/shadows = false
+shader_parameter/shadow_intensity = 1.0
+shader_parameter/shadow_color = Color(0, 0, 0, 1)
+shader_parameter/light_intensity = 1.0
+shader_parameter/light_color = Color(0.679548, 0.685834, 0.626278, 1)
+shader_parameter/shape_color = Color(0.0203435, 0.354896, 9.62615e-08, 1)
+shader_parameter/max_dist = 3.43
+shader_parameter/max_steps = 113
+shader_parameter/iterations = 6
+shader_parameter/power = 11.18
+shader_parameter/bailout = 1.085
 
 [sub_resource type="QuadMesh" id="QuadMesh_wkjtq"]
 lightmap_size_hint = Vector2i(12, 12)
@@ -33,8 +41,9 @@ fov = 45.0
 script = ExtResource("2_5pevn")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Camera3D"]
-transform = Transform3D(0.988315, 0, 0, 0, 0.988315, 0, 0, 0, 0.988315, 0.130209, 0.00347281, 0.017271)
-extra_cull_margin = 5461.33
+transform = Transform3D(0.987119, 0, 0, 0, 0.987119, 0, 0, 0, 0.987119, 0.130209, 0.00347281, 0.017271)
+cast_shadow = 0
+extra_cull_margin = 4497.57
 mesh = SubResource("QuadMesh_wkjtq")
 skeleton = NodePath("../..")
 

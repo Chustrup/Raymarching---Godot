@@ -1,9 +1,28 @@
 shader_type spatial;
 
+group_uniforms Lightning;
 uniform bool lightning = true;
 uniform bool shadows = true;
+uniform float shadow_intensity: hint_range(0.0, 1.0, 0.1) = .1;
+uniform vec3 shadow_color: source_color;
+uniform float light_intensity: hint_range(0.0, 1.0, 0.1) = .1;
+uniform vec3 light_color: source_color;
+group_uniforms;
+
+group_uniforms Shape;
+uniform vec3 shape_color: source_color;
+group_uniforms;
+
 uniform float max_dist = 100.0;
 uniform int max_steps = 100;
+
+group_uniforms Mandelbulb;
+uniform int iterations: hint_range(0, 10) = 1;
+uniform float power = 1.0;
+uniform float bailout = 1.0;
+group_uniforms;
+
+
 
 varying vec3 CAMERA_POSITION;
 varying vec3 CAMERA_DIRECTION;
@@ -35,14 +54,41 @@ float sd_plane(vec3 pos, vec3 plane_pos) {
 	return pos.y - plane_pos.y;
 }
 
+float DE(vec3 pos) {
+	vec3 z = pos;
+	float dr = 1.0;
+	float r = 10.0;
+	for (int i = 0; i < iterations ; i++) {
+		r = length(z);
+		
+		if (r>bailout) break;
+		
+		// convert to polar coordinates
+		float theta = acos(z.z/r);
+		float phi = atan(z.y,z.x);
+		dr =  pow( r, power-1.0)*power*dr + 1.0;
+		
+		// scale and rotate the point
+		float zr = pow( r,power);
+		theta = theta*power;
+		phi = phi*power;
+		
+		// convert back to cartesian coordinates
+		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
+		z+=pos;
+	}
+	return 0.5*log(r)*r/dr;
+}
+
 float get_dist(vec3 pos) {
 	
-	float sphere = sd_sphere(mod(pos, 1.0) - .5, vec3(0, 0, 0), 0.1);
+	float sphere = DE(pos);
 	float plane = sd_plane(pos, vec3(0, -3.0, 0));
 	
 	return sphere;
 	
 } 
+
 
 vec3 get_normal(vec3 pos) {
 	float epsilon = 0.001;
@@ -72,22 +118,22 @@ float RayMarch(vec3 ro, vec3 rd) {
 	
 	float dist_marched = 0.0;
 	const float min_dist = 0.0001;
-for (int i = 0; i < max_steps; i++) {
-		
+	int steps = 0;
+	
+	for (int i = 0; i < max_steps; i++) {
+		steps = i;
 		vec3 currPos = ro + rd * dist_marched;
 		float currDist = get_dist(currPos);
 		
 		dist_marched += currDist;
 		
 		if (dist_marched >= max_dist || currDist <= min_dist) {
-			
 			break;
-			
 		}
 		
 	}
 	
-	return dist_marched;
+	return float(steps) / float(max_steps);
 	
 }
 
@@ -98,17 +144,18 @@ float get_light(vec3 pos, Light light) {
 	
 	float intensity = dot(normal, normalize(toLight));
 	
-	return intensity;
+	return intensity * light_intensity;
 }
 
 float get_shadow(vec3 pos, Light light) {
 	
 	vec3 toLight = light.pos - pos;
 	vec3 dir = normalize(toLight);
-	
 	float march = RayMarch(pos, dir);
 	
-	return float(march * march > dot(toLight, toLight));
+	float result = float(march * march > dot(toLight, toLight));
+	result *= shadow_intensity;
+	return result;
 	
 }
 
@@ -129,29 +176,26 @@ void fragment() {
 	vec3 rd = rd4;
 	float dist_marched = RayMarch(ro, rd);
 	if (dist_marched >= max_dist) {
-		discard;
+		//discard;
 	}
 	
 	vec3 rayPos = ro + rd * dist_marched;
 	
-	Light light = create_light(vec3(5.0));
+	Light light = create_light(vec3(0.0, 10.0, -5.0));
 	
-	
-	
-	vec3 col = vec3(dist_marched * 0.1);
+	vec3 col = vec3(dist_marched);
 	
 	vec3 normal = get_normal(rayPos);
 	
 	if (lightning) {
-		float lightIntensity = get_light(rayPos, light);
-		col *= lightIntensity;
-		
-		if (shadows) {
-			float shadow = get_shadow(rayPos - rd * 0.005, light);
-			col *= shadow;
-		}
+		float light = get_light(rayPos, light);
+		col *= light;
 	}
-	col *= vec3(1.0, 1.0, 0.0);
+	
+	if (shadows) {
+		float shadow = get_shadow(rayPos - rd * 0.005, light);
+		col = mix(col, shadow_color, shadow);
+	}
 	// Called for every pixel the material is visible on.
-	ALBEDO.xyz = col;
+	ALBEDO.xyz = mix((vec3(19, 0, 90) - 50.0) / 255.0, vec3(3, 201, 136) / 255.0, col.x);
 }
