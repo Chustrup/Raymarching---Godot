@@ -1,14 +1,16 @@
-[gd_scene load_steps=8 format=3 uid="uid://dqqw728e3jirk"]
+[gd_scene load_steps=7 format=3 uid="uid://dqqw728e3jirk"]
 
 [ext_resource type="Texture2D" uid="uid://chlemg0bh00vq" path="res://icon.svg" id="1_yovtr"]
-[ext_resource type="Script" path="res://FPSCamera.gd" id="2_5pevn"]
 [ext_resource type="Shader" path="res://Raymarcher.gdshader" id="2_6r3xl"]
-[ext_resource type="Script" path="res://FPSCounter.gd" id="4_oo0kp"]
+[ext_resource type="Script" path="res://FPSCamera.gd" id="2_ntf1b"]
 [ext_resource type="Script" path="res://Shape.gd" id="5_wkhgb"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tiyjb"]
 render_priority = 0
 shader = ExtResource("2_6r3xl")
+shader_parameter/matrix = null
+shader_parameter/max_dist = 1000.0
+shader_parameter/max_steps = 100
 shader_parameter/lightning = false
 shader_parameter/shadows = false
 shader_parameter/shadow_intensity = 1.0
@@ -16,10 +18,8 @@ shader_parameter/shadow_color = Color(0, 0, 0, 1)
 shader_parameter/light_intensity = 1.0
 shader_parameter/light_color = Color(0.679548, 0.685834, 0.626278, 1)
 shader_parameter/shape_color = Color(0.0203435, 0.354896, 9.62615e-08, 1)
-shader_parameter/max_dist = 3.43
-shader_parameter/max_steps = 113
-shader_parameter/iterations = 6
-shader_parameter/power = 11.18
+shader_parameter/iterations = 4
+shader_parameter/power = 14.785
 shader_parameter/bailout = 1.085
 
 [sub_resource type="QuadMesh" id="QuadMesh_wkjtq"]
@@ -31,14 +31,15 @@ size = Vector2(2, 2)
 [node name="Node3D" type="Node3D"]
 
 [node name="Icon" type="Sprite2D" parent="."]
+visible = false
 position = Vector2(19, 25)
 scale = Vector2(0.046875, 0.046875)
 texture = ExtResource("1_yovtr")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1.95378)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.14104)
 fov = 45.0
-script = ExtResource("2_5pevn")
+script = ExtResource("2_ntf1b")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Camera3D"]
 transform = Transform3D(0.987119, 0, 0, 0, 0.987119, 0, 0, 0, 0.987119, 0.130209, 0.00347281, 0.017271)
@@ -48,14 +49,17 @@ mesh = SubResource("QuadMesh_wkjtq")
 skeleton = NodePath("../..")
 
 [node name="Label" type="Label" parent="."]
+visible = false
 offset_top = 1.0
 offset_right = 37.0
 offset_bottom = 24.0
 scale = Vector2(1.74, 1.74)
 theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "1234"
-script = ExtResource("4_oo0kp")
 
 [node name="Node3D" type="Node3D" parent="." node_paths=PackedStringArray("meshInstance")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.02316, 0.656372, 0)
 script = ExtResource("5_wkhgb")
+width = 1.345
+height = 1.9
 meshInstance = NodePath("../Camera3D/MeshInstance3D")

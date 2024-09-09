@@ -1,5 +1,7 @@
 shader_type spatial;
 
+uniform mat4 matrix;
+
 group_uniforms Lightning;
 uniform bool lightning = true;
 uniform bool shadows = true;
@@ -33,6 +35,8 @@ struct Light {
 	vec3 pos;
 };
 
+
+
 void vertex() {
 	
 	CAMERA_POSITION = CAMERA_POSITION_WORLD;
@@ -43,16 +47,15 @@ void vertex() {
 	
 }
 
-
 float sd_sphere(vec3 pos, vec3 sphere_pos, float r) {
-	
-	return length(pos - sphere_pos) - r;
-	
+	return length(pos) - r;
 }
 
 float sd_plane(vec3 pos, vec3 plane_pos) {
 	return pos.y - plane_pos.y;
 }
+
+
 
 float DE(vec3 pos) {
 	vec3 z = pos;
@@ -82,10 +85,14 @@ float DE(vec3 pos) {
 
 float get_dist(vec3 pos) {
 	
-	float sphere = DE(pos);
-	float plane = sd_plane(pos, vec3(0, -3.0, 0));
+	vec4 transformed4 = (matrix * vec4(pos, 1.0));
+	vec3 transformed = transformed4.xyz;
 	
-	return sphere;
+	float sphere = DE(pos);
+	float s = sd_sphere(transformed, vec3(0.0), 1.0);
+	float plane = sd_plane(transformed, vec3(0, -3.0, 0));
+	
+	return s;
 	
 } 
 
@@ -117,7 +124,7 @@ Light create_light(vec3 pos) {
 float RayMarch(vec3 ro, vec3 rd) {
 	
 	float dist_marched = 0.0;
-	const float min_dist = 0.0001;
+	const float min_dist = 0.001;
 	int steps = 0;
 	
 	for (int i = 0; i < max_steps; i++) {
@@ -133,7 +140,7 @@ float RayMarch(vec3 ro, vec3 rd) {
 		
 	}
 	
-	return float(steps) / float(max_steps);
+	return dist_marched;
 	
 }
 
@@ -148,7 +155,6 @@ float get_light(vec3 pos, Light light) {
 }
 
 float get_shadow(vec3 pos, Light light) {
-	
 	vec3 toLight = light.pos - pos;
 	vec3 dir = normalize(toLight);
 	float march = RayMarch(pos, dir);
@@ -156,7 +162,6 @@ float get_shadow(vec3 pos, Light light) {
 	float result = float(march * march > dot(toLight, toLight));
 	result *= shadow_intensity;
 	return result;
-	
 }
 
 
@@ -167,7 +172,6 @@ void fragment() {
 	
 	uv = (uv * 2.0) - 1.0;
 
-	
 	vec3 rd4 = (_INVERSE_PROJECTION * vec4(uv, .0, 1.0)).xyz;
 	rd4 = (_CAMERA_MATRIX * vec4(rd4, 0)).xyz;
 	rd4 = normalize(rd4);
@@ -175,8 +179,8 @@ void fragment() {
 	vec3 ro = CAMERA_POSITION;
 	vec3 rd = rd4;
 	float dist_marched = RayMarch(ro, rd);
-	if (dist_marched >= max_dist) {
-		//discard;
+	if (dist_marched > max_dist) {
+		discard;
 	}
 	
 	vec3 rayPos = ro + rd * dist_marched;
@@ -194,8 +198,9 @@ void fragment() {
 	
 	if (shadows) {
 		float shadow = get_shadow(rayPos - rd * 0.005, light);
-		col = mix(col, shadow_color, shadow);
+		col = col * shadow;
 	}
-	// Called for every pixel the material is visible on.
-	ALBEDO.xyz = mix((vec3(19, 0, 90) - 50.0) / 255.0, vec3(3, 201, 136) / 255.0, col.x);
+	
+	//ALBEDO.xyz = mix((vec3(19, 0, 90)) / 255.0, vec3(3, 201, 136) / 255.0, col.x);
+	ALBEDO.xyz = col;
 }
