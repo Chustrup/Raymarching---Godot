@@ -1,28 +1,41 @@
 @tool
-extends Node3D
+class_name Shape extends Node3D
 
-@export 
-var width: float
-
-@export 
-var height: float
+enum ShapeType {
+	Sphere,
+	Cube,
+	Cylinder
+}
 
 @export
-var meshInstance: MeshInstance3D
-var material: ShaderMaterial
+var type: ShapeType = ShapeType.Sphere
+
+@export_range(0.001, 1.0)
+var min_influence: float
+
+var width: float:
+	get:
+		return transform.basis.get_scale().x
+
+var height: float:
+	get:
+		return transform.basis.get_scale().y
+			
+var matrix: Transform3D: 
+	get:
+		return _get_matrix()
 
 func _ready():
-	material = meshInstance.get_active_material(0)
+	pass
 	
 
 func _process(delta):
-	var matrix = transform.affine_inverse()
-	meshInstance.get_active_material(0).set_shader_parameter("matrix", matrix)
-
-func get_matrix() -> Transform3D:
-	var b = basis
-	b = b.scaled(Vector3(1.0, 1.0, 1.0) / b.get_scale())
-	var t = Transform3D(b, transform.origin)
+	var matrix = _get_matrix()
 	
-	return t
+
+func _get_matrix() -> Transform3D:
+	var _transform = transform.affine_inverse()
+	#_transform = _transform.scaled(Vector3(1.0, 1.0, 1.0) / _transform.basis.get_scale())
+	
+	return _transform
 	

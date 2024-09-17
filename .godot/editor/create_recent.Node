@@ -1,7 +1,13 @@
-Camera3D
+Tree
+TabBar
+Line2D
 MeshInstance3D
+Node3D
+Label
+ColorRect
+Node
+Camera3D
 SubViewport
 Camera2D
 Node2D
-ColorRect
 CanvasLayer

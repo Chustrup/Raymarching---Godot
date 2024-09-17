@@ -1,6 +1,11 @@
 shader_type spatial;
 
-uniform mat4 matrix;
+uniform int shapeCount = 10;
+uniform float widths[100];
+uniform float heights[100];
+uniform int types[100];
+uniform mat4 matrices[100];
+uniform float minInfluences[100];
 
 group_uniforms Lightning;
 uniform bool lightning = true;
@@ -55,7 +60,18 @@ float sd_plane(vec3 pos, vec3 plane_pos) {
 	return pos.y - plane_pos.y;
 }
 
+float sdBox( vec3 p, vec3 b )
+{
+  vec3 q = abs(p) - b;
+  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+}
 
+float smin( float a, float b, float k )
+{
+    k *= 1.0/(1.0-sqrt(0.5));
+    float h = max( k-abs(a-b), 0.0 )/k;
+    return min(a,b) - k*0.5*(1.0+h-sqrt(1.0-h*(h-2.0)));
+}
 
 float DE(vec3 pos) {
 	vec3 z = pos;
@@ -85,14 +101,36 @@ float DE(vec3 pos) {
 
 float get_dist(vec3 pos) {
 	
-	vec4 transformed4 = (matrix * vec4(pos, 1.0));
-	vec3 transformed = transformed4.xyz;
+	float sum = max_dist;
 	
-	float sphere = DE(pos);
-	float s = sd_sphere(transformed, vec3(0.0), 1.0);
-	float plane = sd_plane(transformed, vec3(0, -3.0, 0));
+	for (int i = 0; i < shapeCount; i++) {
+		
+		mat4 matrix = matrices[i];
+		int type = types[i];
+		float width = widths[i];
+		float height = heights[i];
+		float minInfluence = minInfluences[i];
+		
+		vec4 transformed4 = (matrix * vec4(pos, 1.0));
+		vec3 transformed = transformed4.xyz / transformed4.w;
 	
-	return s;
+		float sdf;
+	
+		switch (type) {
+			case 0:
+				sdf = sd_sphere(transformed, vec3(0.0), width);
+				break;
+			case 1:
+				sdf = sdBox(transformed, vec3(1.0));
+				break;
+		};
+
+		
+		sum = smin(sum, sdf, minInfluence);
+	
+	}
+	
+	return sum;
 	
 } 
 
