@@ -13,6 +13,9 @@ var type: ShapeType = ShapeType.Sphere
 @export_range(0.001, 1.0)
 var min_influence: float
 
+@export 
+var color: Color = Color.WHITE
+
 var width: float:
 	get:
 		return transform.basis.get_scale().x

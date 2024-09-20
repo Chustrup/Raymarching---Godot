@@ -6,6 +6,7 @@ uniform float heights[100];
 uniform int types[100];
 uniform mat4 matrices[100];
 uniform float minInfluences[100];
+uniform vec3 colors[100];
 
 group_uniforms Lightning;
 uniform bool lightning = true;
@@ -66,14 +67,16 @@ float sdBox( vec3 p, vec3 b )
   return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
-float smin( float a, float b, float k )
+vec2 smin( float a, float b, float k )
 {
-    k *= 1.0/(1.0-sqrt(0.5));
-    float h = max( k-abs(a-b), 0.0 )/k;
-    return min(a,b) - k*0.5*(1.0+h-sqrt(1.0-h*(h-2.0)));
+    float h = 1.0 - min( abs(a-b)/(4.0*k), 1.0 );
+    float w = h*h;
+    float m = w*0.5;
+    float s = w*k;
+    return (a<b) ? vec2(a-s,m) : vec2(b-s,1.0-m);
 }
 
-float DE(vec3 pos) {
+float DE(vec3 pos) {	
 	vec3 z = pos;
 	float dr = 1.0;
 	float r = 10.0;
@@ -85,7 +88,7 @@ float DE(vec3 pos) {
 		// convert to polar coordinates
 		float theta = acos(z.z/r);
 		float phi = atan(z.y,z.x);
-		dr =  pow( r, power-1.0)*power*dr + 1.0;
+		dr =  pow(r, power-1.0)*power*dr + 1.0;
 		
 		// scale and rotate the point
 		float zr = pow( r,power);
@@ -99,10 +102,10 @@ float DE(vec3 pos) {
 	return 0.5*log(r)*r/dr;
 }
 
-float get_dist(vec3 pos) {
+vec4 get_dist(vec3 pos) {
 	
 	float sum = max_dist;
-	
+	vec3 color;	
 	for (int i = 0; i < shapeCount; i++) {
 		
 		mat4 matrix = matrices[i];
@@ -110,6 +113,7 @@ float get_dist(vec3 pos) {
 		float width = widths[i];
 		float height = heights[i];
 		float minInfluence = minInfluences[i];
+		
 		
 		vec4 transformed4 = (matrix * vec4(pos, 1.0));
 		vec3 transformed = transformed4.xyz / transformed4.w;
@@ -124,14 +128,21 @@ float get_dist(vec3 pos) {
 				sdf = sdBox(transformed, vec3(1.0));
 				break;
 		};
-
 		
-		sum = smin(sum, sdf, minInfluence);
-	
+		vec2 _min = smin(sum, sdf, minInfluence);
+		if (color == vec3(-1.0)) {
+
+			color = colors[i];
+			
+		} else {
+			
+			color = mix(color, colors[i], _min.y);
+			
+		}
+		sum = _min.x;
 	}
 	
-	return sum;
-	
+	return vec4(color, sum);
 } 
 
 
@@ -139,11 +150,11 @@ vec3 get_normal(vec3 pos) {
 	float epsilon = 0.001;
 	vec2 epsilonVec = vec2(epsilon, 0.0);
 	
-	float curr_dist = get_dist(pos);
+	float curr_dist = get_dist(pos).w;
 	
-	float x = get_dist(pos - epsilonVec.xyy);
-	float y = get_dist(pos - epsilonVec.yxy);
-	float z = get_dist(pos - epsilonVec.yyx);
+	float x = get_dist(pos - epsilonVec.xyy).w;
+	float y = get_dist(pos - epsilonVec.yxy).w;
+	float z = get_dist(pos - epsilonVec.yyx).w;
 	
 	return normalize(curr_dist - vec3(x, y, z));
 }
@@ -159,17 +170,20 @@ Light create_light(vec3 pos) {
 	return light;
 }
 
-float RayMarch(vec3 ro, vec3 rd) {
+vec4 RayMarch(vec3 ro, vec3 rd) {
 	
 	float dist_marched = 0.0;
 	const float min_dist = 0.001;
 	int steps = 0;
 	
+	vec3 result_color;
+	
 	for (int i = 0; i < max_steps; i++) {
 		steps = i;
 		vec3 currPos = ro + rd * dist_marched;
-		float currDist = get_dist(currPos);
-		
+		vec4 dist_result = get_dist(currPos);
+		result_color = dist_result.xyz;
+		float currDist = dist_result.w;
 		dist_marched += currDist;
 		
 		if (dist_marched >= max_dist || currDist <= min_dist) {
@@ -178,7 +192,7 @@ float RayMarch(vec3 ro, vec3 rd) {
 		
 	}
 	
-	return dist_marched;
+	return vec4(result_color, dist_marched);
 	
 }
 
@@ -195,7 +209,8 @@ float get_light(vec3 pos, Light light) {
 float get_shadow(vec3 pos, Light light) {
 	vec3 toLight = light.pos - pos;
 	vec3 dir = normalize(toLight);
-	float march = RayMarch(pos, dir);
+	vec4 march_result = RayMarch(pos, dir);
+	float march = march_result.w;
 	
 	float result = float(march * march > dot(toLight, toLight));
 	result *= shadow_intensity;
@@ -216,7 +231,8 @@ void fragment() {
 	
 	vec3 ro = CAMERA_POSITION;
 	vec3 rd = rd4;
-	float dist_marched = RayMarch(ro, rd);
+	vec4 march_result = RayMarch(ro, rd);
+	float dist_marched = march_result.w;
 	if (dist_marched > max_dist) {
 		discard;
 	}
@@ -225,7 +241,7 @@ void fragment() {
 	
 	Light light = create_light(vec3(0.0, 10.0, -5.0));
 	
-	vec3 col = vec3(dist_marched);
+	vec3 col = march_result.xyz;
 	
 	vec3 normal = get_normal(rayPos);
 	

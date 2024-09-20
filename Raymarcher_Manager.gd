@@ -29,10 +29,13 @@ func _process(delta):
 	var matrices = []
 	var types = []
 	var min_influcenes = []
+	var colors = []
+	
 	for shape in shape_nodes:
 		widths.append(shape.width)
 		min_influcenes.append(shape.min_influence)
 		heights.append(shape.height)
+		colors.append(shape.color)
 		matrices.append(shape.matrix)
 		types.append(int(shape.type))
 
@@ -40,6 +43,7 @@ func _process(delta):
 	shader.set_shader_parameter("widths", widths)
 	shader.set_shader_parameter("heights", heights)
 	shader.set_shader_parameter("minInfluences", min_influcenes)
+	shader.set_shader_parameter("colors", colors)
 
 	shader.set_shader_parameter("matrices", matrices)
 	shader.set_shader_parameter("types", types)
