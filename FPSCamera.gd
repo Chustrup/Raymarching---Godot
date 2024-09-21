@@ -1,8 +1,5 @@
 extends Camera3D
 
-
-
-
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED;
 # Called every frame. 'delta' is the elapsed time since the previous frame.

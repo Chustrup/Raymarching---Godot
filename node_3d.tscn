@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://dqqw728e3jirk"]
+[gd_scene load_steps=7 format=3 uid="uid://c0gvpyha6j4j6"]
 
 [ext_resource type="Shader" path="res://Raymarcher.gdshader" id="2_6r3xl"]
 [ext_resource type="Script" path="res://FPSCamera.gd" id="2_ntf1b"]
@@ -8,6 +8,27 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tiyjb"]
 render_priority = 0
 shader = ExtResource("2_6r3xl")
+shader_parameter/shapeCount = 3
+shader_parameter/lightsCount = 6
+shader_parameter/widths = [1.0, 1.27644, 1.17616]
+shader_parameter/heights = [1.0, 1.27644, 1.17616]
+shader_parameter/types = [1, 0, 0]
+shader_parameter/matrices = [Transform3D(0.0353969, -0.75802, -0.651269, 0.0411382, 0.652231, -0.756903, 0.998527, 9.31322e-09, 0.0542705, 5.60487, -6.07896, -2.14987), Transform3D(0.358957, -0.696357, 0, 0.696357, 0.358957, 0, 0, 0, 0.783429, 6.11264, -0.63719, -1.17053), Transform3D(0.850224, 0, 0, 0, 0.850224, 0, 0, 0, 0.850224, -4.36535, -7.22361, -0.0849431)]
+shader_parameter/minInfluences = [0.523, 0.15, 0.536]
+shader_parameter/colors = [Color(0.986443, 0.282863, 0.462406, 1), Color(0.65098, 0.564706, 0.196078, 1), Color(0, 0.528933, 0.249637, 1)]
+shader_parameter/lights = [Vector3(0.269237, 11.2345, 1.58197), Vector3(0.724091, 11.5526, -7.15436), Vector3(-12.7827, 7.08017, 10.367), Vector3(5.65156, 7.08017, 10.367), Vector3(5.65156, -0.0809822, -3.14022), Vector3(-15.3581, 14.8707, -3.14022)]
+shader_parameter/max_dist = 1000.0
+shader_parameter/max_steps = 136
+shader_parameter/lightning = true
+shader_parameter/shadows = false
+shader_parameter/shadow_intensity = 1.0
+shader_parameter/shadow_color = Color(0, 0, 0, 1)
+shader_parameter/light_intensity = 1.0
+shader_parameter/light_color = Color(0.679548, 0.685834, 0.626278, 1)
+shader_parameter/shape_color = Color(0.0203435, 0.354896, 9.62615e-08, 1)
+shader_parameter/iterations = 4
+shader_parameter/power = 14.785
+shader_parameter/bailout = 1.085
 
 [sub_resource type="QuadMesh" id="QuadMesh_wkjtq"]
 lightmap_size_hint = Vector2i(12, 12)
@@ -31,19 +52,44 @@ skeleton = NodePath("../..")
 script = ExtResource("4_3see7")
 
 [node name="Shape" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.02618, 2.96161, -1.32838)
+transform = Transform3D(0.0353969, 0.0411381, 0.998526, -0.758021, 0.652231, 0, -0.65127, -0.756903, 0.0542705, 2.19838, 8.21349, -0.834223)
 script = ExtResource("5_wkhgb")
-min_influence = 0.238
-color = Color(0.0363212, 0.170101, 0.317978, 1)
+type = 1
+min_influence = 0.523
+color = Color(0.986443, 0.282863, 0.462406, 1)
 
 [node name="Shape2" type="Node3D" parent="."]
-transform = Transform3D(0.67297, 0, 0, 0, 0.67297, 0, 0, 0, 0.67297, 0.763543, 4.59872, -0.310548)
+transform = Transform3D(0.584846, 1.13457, 0, -1.13457, 0.584846, 0, 0, 0, 1.27644, -2.85202, 7.30787, 1.49411)
 script = ExtResource("5_wkhgb")
-min_influence = 0.745
-color = Color(0.690215, 0.0664702, 0.337616, 1)
+min_influence = 0.15
+color = Color(0.65098, 0.564706, 0.196078, 1)
 
 [node name="Shape3" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.32734, 4.30665, -1.80266)
+transform = Transform3D(1.17616, 0, 0, 0, 1.17616, 0, 0, 0, 1.17616, 5.13435, 8.49612, 0.0999067)
 script = ExtResource("5_wkhgb")
-min_influence = 0.636
-color = Color(9.62615e-07, 0.619869, 0.933092, 1)
+min_influence = 0.536
+color = Color(0, 0.528933, 0.249637, 1)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.724091, 11.5526, -7.15436)
+omni_range = 1.70737
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.269237, 11.2345, 1.58197)
+omni_range = 1.70737
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.7827, 7.08017, 10.367)
+omni_range = 1.70737
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.65156, 7.08017, 10.367)
+omni_range = 1.70737
+
+[node name="OmniLight3D5" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.65156, -0.0809822, -3.14022)
+omni_range = 1.70737
+
+[node name="OmniLight3D6" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.3581, 14.8707, -3.14022)
+omni_range = 1.70737

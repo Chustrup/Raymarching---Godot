@@ -1,12 +1,14 @@
 shader_type spatial;
 
 uniform int shapeCount = 10;
+uniform int lightsCount = 10;
 uniform float widths[100];
 uniform float heights[100];
 uniform int types[100];
 uniform mat4 matrices[100];
 uniform float minInfluences[100];
 uniform vec3 colors[100];
+uniform vec3 lights[100];
 
 group_uniforms Lightning;
 uniform bool lightning = true;
@@ -197,13 +199,20 @@ vec4 RayMarch(vec3 ro, vec3 rd) {
 }
 
 float get_light(vec3 pos, Light light) {
+	float intensity = 0.0;
 	
-	vec3 toLight = light.pos - pos;
-	vec3 normal = get_normal(pos);
+	for (int i = 0; i < lightsCount; i++) {
 	
-	float intensity = dot(normal, normalize(toLight));
+		vec3 currLight = lights[i];
 	
-	return intensity * light_intensity;
+		vec3 toLight = currLight - pos;
+		vec3 normal = get_normal(pos);
+		intensity += max(dot(normal, normalize(toLight)), 0.0);
+	}
+	
+	//intensity = min(intensity, 1.0);
+	
+	return intensity;
 }
 
 float get_shadow(vec3 pos, Light light) {
@@ -239,7 +248,7 @@ void fragment() {
 	
 	vec3 rayPos = ro + rd * dist_marched;
 	
-	Light light = create_light(vec3(0.0, 10.0, -5.0));
+	Light light = create_light(vec3(0.0, 0.0, 10.0));
 	
 	vec3 col = march_result.xyz;
 	

@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://octwrke67ecl"]
+
+[ext_resource type="Script" path="res://LavaLamp.gd" id="1_glf23"]
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_glf23")
