@@ -1,0 +1,5 @@
+[gd_scene load_steps=2 format=3 uid="uid://dxo5s72rygej"]
+
+[ext_resource type="PackedScene" uid="uid://dg06jct0t80e8" path="res://lavalamp.obj" id="1_veyi1"]
+
+[node name="lavalamp" instance=ExtResource("1_veyi1")]

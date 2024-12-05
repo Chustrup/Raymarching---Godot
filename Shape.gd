@@ -23,6 +23,10 @@ var width: float:
 var height: float:
 	get:
 		return transform.basis.get_scale().y
+		
+var depth: float:
+	get:
+		return transform.basis.get_scale().z
 			
 var matrix: Transform3D: 
 	get:
@@ -38,7 +42,7 @@ func _process(delta):
 
 func _get_matrix() -> Transform3D:
 	var _transform = transform.affine_inverse()
-	#_transform = _transform.scaled(Vector3(1.0, 1.0, 1.0) / _transform.basis.get_scale())
+	_transform = _transform.scaled(Vector3(1.0, 1.0, 1.0) / _transform.basis.get_scale())
 	
 	return _transform
 	

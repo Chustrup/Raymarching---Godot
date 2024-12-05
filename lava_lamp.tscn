@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://blirsi4jp5fjg"]
+
+[ext_resource type="PackedScene" uid="uid://dxo5s72rygej" path="res://lavalamp-edit.tscn" id="1_u2swj"]
+
+[node name="LavaLamp" type="Node3D"]
+
+[node name="lavalamp" parent="." instance=ExtResource("1_u2swj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0157899, 3.57628e-07, -0.0598383)

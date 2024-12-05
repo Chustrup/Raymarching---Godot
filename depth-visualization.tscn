@@ -1,0 +1,126 @@
+[gd_scene load_steps=11 format=3 uid="uid://cll8b2q24o0v2"]
+
+[ext_resource type="Script" path="res://FPSCamera.gd" id="1_qp6fk"]
+[ext_resource type="Shader" path="res://Raymarcher.gdshader" id="2_1nots"]
+[ext_resource type="Script" path="res://Raymarcher_Manager.gd" id="3_xaiwy"]
+[ext_resource type="Script" path="res://Shape.gd" id="4_mo6xa"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_foyda"]
+render_priority = 0
+shader = ExtResource("2_1nots")
+shader_parameter/shapeCount = 2
+shader_parameter/lightsCount = 5
+shader_parameter/widths = [0.35544, 0.444163]
+shader_parameter/heights = [0.35544, 0.444163]
+shader_parameter/depths = [0.35544, 0.513413]
+shader_parameter/types = [0, 1]
+shader_parameter/matrices = [Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.392499, -1.2332, 1.39789), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.52893, -1.18751, -0.502562)]
+shader_parameter/minInfluences = [0.001, 0.001]
+shader_parameter/colors = [Color(1.58831e-06, 0.853326, 0.267508, 1), Color(1.58831e-06, 0.853326, 0.267508, 1)]
+shader_parameter/lights = [Vector3(-2.51484, 0.180535, 0.767213), Vector3(3.07907, 0.713451, 0.767213), Vector3(-0.0308867, 3.5739, 0.767213), Vector3(-0.0308867, -0.28181, 4.20284), Vector3(-0.0308867, -0.28181, -6.70855)]
+shader_parameter/max_dist = 100.0
+shader_parameter/max_steps = 100
+shader_parameter/lightning = true
+shader_parameter/shadows = false
+shader_parameter/shadow_intensity = 0.1
+shader_parameter/shadow_color = null
+shader_parameter/light_intensity = 0.1
+shader_parameter/light_color = null
+shader_parameter/shape_color = null
+shader_parameter/iterations = 1
+shader_parameter/power = 1.0
+shader_parameter/bailout = 1.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_a1v1s"]
+lightmap_size_hint = Vector2i(12, 12)
+material = SubResource("ShaderMaterial_foyda")
+flip_faces = true
+size = Vector2(2, 2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ogvcu"]
+albedo_color = Color(0.137255, 1, 0, 1)
+metallic = 0.23
+metallic_specular = 0.69
+
+[sub_resource type="BoxMesh" id="BoxMesh_0b0f1"]
+material = SubResource("StandardMaterial3D_ogvcu")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jj2m6"]
+albedo_color = Color(1, 0, 0.196078, 1)
+metallic = 0.38
+roughness = 0.27
+
+[sub_resource type="SphereMesh" id="SphereMesh_ghm8t"]
+material = SubResource("StandardMaterial3D_jj2m6")
+
+[node name="Node3D" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.14104)
+current = true
+fov = 45.0
+script = ExtResource("1_qp6fk")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Camera3D"]
+cast_shadow = 0
+extra_cull_margin = 12444.2
+mesh = SubResource("QuadMesh_a1v1s")
+skeleton = NodePath("../..")
+script = ExtResource("3_xaiwy")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.502987, 8.5749e-09, 0.178572, 0.0904198, 0.476109, -0.254688, -0.153987, 0.279566, 0.43374, -1.2547, 1.65807, 0.886958)
+mesh = SubResource("BoxMesh_0b0f1")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.460956, -0.224922, 0.158509, -0.0729168, 0.20866, 0.488752, -0.259011, -0.45903, 0.144502, 1.30008, 1.51061, 0.328072)
+mesh = SubResource("BoxMesh_0b0f1")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.460956, -0.224922, 0.158509, -0.0729168, 0.20866, 0.488752, -0.259011, -0.45903, 0.144502, 0.575478, 1.0169, -1.84889)
+mesh = SubResource("SphereMesh_ghm8t")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="MeshInstance3D5" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.460956, -0.224922, 0.158509, -0.0729168, 0.20866, 0.488752, -0.259011, -0.45903, 0.144502, -1.30846, 0.759771, -1.06635)
+mesh = SubResource("SphereMesh_ghm8t")
+skeleton = NodePath("../MeshInstance3D")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(4.53655, 0, 0, 0, 0.138802, 0, 0, 0, 4.53655, 0, 0, 0)
+mesh = SubResource("BoxMesh_0b0f1")
+
+[node name="Shape" type="Node3D" parent="."]
+transform = Transform3D(0.35544, 0, 0, 0, 0.35544, 0, 0, 0, 0.35544, -0.392499, 1.2332, -1.39789)
+script = ExtResource("4_mo6xa")
+min_influence = 0.001
+color = Color(1.58831e-06, 0.853326, 0.267508, 1)
+
+[node name="Shape2" type="Node3D" parent="."]
+transform = Transform3D(0.444163, 0, 0, 0, 0.444163, 0, 0, 0, 0.513413, 1.52893, 1.18751, 0.502562)
+script = ExtResource("4_mo6xa")
+type = 1
+min_influence = 0.001
+color = Color(1.58831e-06, 0.853326, 0.267508, 1)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.51484, 0.180535, 0.767213)
+omni_range = 2.426
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.07907, 0.713451, 0.767213)
+omni_range = 2.426
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0308867, 3.5739, 0.767213)
+omni_range = 2.426
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0308867, -0.28181, 4.20284)
+omni_range = 2.426
+
+[node name="OmniLight3D5" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0308867, -0.28181, -6.70855)
+omni_range = 2.426

@@ -12,6 +12,7 @@ func _ready():
 	root.child_entered_tree.connect(_on_new_node)
 	root.child_exiting_tree.connect(_on_remove_node)
 	shader = get_active_material(0)
+	
 	var all_nodes = get_tree().edited_scene_root.get_children(true)
 	for node in all_nodes:
 		if node is Shape:
@@ -41,6 +42,7 @@ func _process(delta):
 
 	var widths = []
 	var heights = []
+	var depths = []
 	var matrices = []
 	var types = []
 	var min_influcenes = []
@@ -48,8 +50,9 @@ func _process(delta):
 	
 	for shape in shape_nodes:
 		widths.append(shape.width)
-		min_influcenes.append(shape.min_influence)
 		heights.append(shape.height)
+		depths.append(shape.depth)
+		min_influcenes.append(shape.min_influence)
 		colors.append(shape.color)
 		matrices.append(shape.matrix)
 		types.append(int(shape.type))
@@ -58,12 +61,13 @@ func _process(delta):
 	shader.set_shader_parameter("shapeCount", len(shape_nodes))
 	shader.set_shader_parameter("widths", widths)
 	shader.set_shader_parameter("heights", heights)
+	shader.set_shader_parameter("depths", depths)
 	shader.set_shader_parameter("minInfluences", min_influcenes)
 	shader.set_shader_parameter("colors", colors)
 
 	shader.set_shader_parameter("matrices", matrices)
 	shader.set_shader_parameter("types", types)
-	print(len(light_nodes))
+
 	shader.set_shader_parameter("lights", light_nodes.map(func(light): return light.position))
 	shader.set_shader_parameter("lightsCount", len(light_nodes))
 	
