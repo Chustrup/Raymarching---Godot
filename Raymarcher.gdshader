@@ -1,5 +1,7 @@
 shader_type spatial;
 
+render_mode unshaded, fog_disabled;
+
 uniform int shapeCount = 10;
 uniform int lightsCount = 10;
 uniform float widths[100];
@@ -40,11 +42,12 @@ varying vec3 CAMERA_DIRECTION;
 varying mat4 _CAMERA_MATRIX;
 varying mat4 _INVERSE_PROJECTION;
 
+uniform sampler2D depth_texture : hint_depth_texture;
+
+
 struct Light {
 	vec3 pos;
 };
-
-
 
 void vertex() {
 
@@ -197,7 +200,7 @@ vec4 RayMarch(vec3 ro, vec3 rd) {
 
 }
 
-float get_light(vec3 pos, Light light) {
+float get_light(vec3 pos) {
 	float intensity = 0.0;
 
 	for (int i = 0; i < lightsCount; i++) {
@@ -206,23 +209,32 @@ float get_light(vec3 pos, Light light) {
 
 		vec3 toLight = currLight - pos;
 		vec3 normal = get_normal(pos);
-		intensity += max(dot(normal, normalize(toLight)), 0.0);
+		float dist = length(toLight);
+		intensity += dot(normal, normalize(toLight));
 	}
 
-	//intensity = min(intensity, 1.0);
+	intensity = clamp(intensity, 0.0, 1.0);
 
 	return intensity;
 }
 
-float get_shadow(vec3 pos, Light light) {
-	vec3 toLight = light.pos - pos;
-	vec3 dir = normalize(toLight);
-	vec4 march_result = RayMarch(pos, dir);
-	float march = march_result.w;
-
-	float result = float(march * march > dot(toLight, toLight));
-	result *= shadow_intensity;
-	return result;
+float get_shadow(vec3 pos) {
+	
+	
+	float totalResult = 0.0;
+	
+	for (int i = 0; i < lightsCount; i++) {
+		
+		Light light = create_light(lights[i]);
+		
+		vec3 toLight = light.pos - pos;
+		vec3 dir = normalize(toLight);
+		vec4 march_result = RayMarch(pos, dir);
+		float march = march_result.w;
+		totalResult = max(float(march * march > dot(toLight, toLight)), totalResult);
+	}
+	
+	return totalResult * shadow_intensity;
 }
 
 
@@ -233,7 +245,13 @@ void fragment() {
 
 	uv = (uv * 2.0) - 1.0;
 
-	vec3 rd4 = (_INVERSE_PROJECTION * vec4(uv, .0, 1.0)).xyz;
+	float depth = texture(depth_texture, SCREEN_UV).x;
+
+	vec3 ndc = vec3(uv, depth);
+	vec4 view = _INVERSE_PROJECTION *  vec4(ndc, 1.0);
+	view.xyz /= view.w;
+	float linear_depth = -view.z / 4000.0;
+	vec3 rd4 = view.xyz;
 	rd4 = (_CAMERA_MATRIX * vec4(rd4, 0)).xyz;
 	rd4 = normalize(rd4);
 
@@ -241,28 +259,28 @@ void fragment() {
 	vec3 rd = rd4;
 	vec4 march_result = RayMarch(ro, rd);
 	float dist_marched = march_result.w;
-	if (dist_marched > max_dist) {
+	float march_percent = dist_marched / 4000.0;
+	
+	if (dist_marched > max_dist || march_percent > linear_depth) {
 		discard;
 	}
-
+	
 	vec3 rayPos = ro + rd * dist_marched;
 
-	Light light = create_light(vec3(0.0, 0.0, 10.0));
 
 	vec3 col = march_result.xyz;
 
-	vec3 normal = get_normal(rayPos);
-
 	if (lightning) {
-		float light = get_light(rayPos, light);
+		float light = max(get_light(rayPos), 0.05);
 		col *= light;
 	}
 
 	if (shadows) {
-		float shadow = get_shadow(rayPos - rd * 0.005, light);
-		col = col * shadow;
+		float shadow = get_shadow(rayPos - rd * 0.005);
+		col *= shadow;
 	}
-	ALBEDO.xyz = col;
+	
+	ALBEDO.xyz = vec3(col);
 
 	//ALBEDO.xyz = mix((vec3(19, 0, 90)) / 255.0, vec3(3, 201, 136) / 255.0, col.x);
 

@@ -1,4 +1,5 @@
 OmniLight3D
+SpotLight3D
 MeshInstance3D
 DirectionalLight3D
 SubViewport
@@ -11,4 +12,3 @@ Label
 ColorRect
 Node
 Camera2D
-Node2D

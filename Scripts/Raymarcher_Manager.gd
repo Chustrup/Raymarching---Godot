@@ -5,6 +5,8 @@ var shader: ShaderMaterial
 var shape_nodes: Array[Shape] = []
 var light_nodes: Array[Light3D] = []
 
+var last_update_time: float = 0.0
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	
@@ -39,7 +41,9 @@ func _on_remove_node(node: Node):
 		light_nodes.remove_at(index)
 		
 func _process(delta):
-
+	
+	var start_time = Time.get_ticks_msec()  # Tempo inicial em milissegundos
+	
 	var widths = []
 	var heights = []
 	var depths = []
@@ -70,6 +74,10 @@ func _process(delta):
 
 	shader.set_shader_parameter("lights", light_nodes.map(func(light): return light.position))
 	shader.set_shader_parameter("lightsCount", len(light_nodes))
+	
+	var end_time = Time.get_ticks_msec()  # Tempo final em milissegundos
+	last_update_time = end_time - start_time
+	print("Tempo de atualização: %sms" % last_update_time)
 	
 	
 		
