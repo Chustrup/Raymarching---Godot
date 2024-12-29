@@ -17,14 +17,13 @@ config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=1280
-window/size/viewport_height=720
+window/size/viewport_width=1920
+window/size/viewport_height=1080
 
 [editor]
 
 movie_writer/mjpeg_quality=1.0
-movie_writer/movie_file="C:/Users/inaci/Documents/GodotProjs/mandelbulb3.avi"
-movie_writer/fps=30
+movie_writer/movie_file="/Users/chustrupfx/Library/Mobile Documents/com~apple~CloudDocs/Videos YT/Raymarching/Bruto/Raymarching/LavaLamp Recs/lavalamp1.avi"
 
 [input]
 

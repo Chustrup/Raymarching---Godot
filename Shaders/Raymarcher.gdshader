@@ -2,6 +2,9 @@ shader_type spatial;
 
 render_mode unshaded, fog_disabled;
 
+#include "res://Shaders/includes/sdfs.gdshaderinc"
+#include "includes/math.gdshaderinc"
+
 uniform int shapeCount = 10;
 uniform int lightsCount = 10;
 uniform float widths[100];
@@ -12,13 +15,14 @@ uniform mat4 matrices[100];
 uniform float minInfluences[100];
 uniform vec3 colors[100];
 uniform vec3 lights[100];
+uniform int operations[100];
 
 group_uniforms Lightning;
 uniform bool lightning = true;
 uniform bool shadows = true;
 uniform float shadow_intensity: hint_range(0.0, 1.0, 0.1) = .1;
 uniform vec3 shadow_color: source_color;
-uniform float light_intensity: hint_range(0.0, 1.0, 0.1) = .1;
+uniform float light_intensity: hint_range(0.0, 10.0, 0.1) = .1;
 uniform vec3 light_color: source_color;
 group_uniforms;
 
@@ -35,8 +39,6 @@ uniform float power = 1.0;
 uniform float bailout = 1.0;
 group_uniforms;
 
-
-
 varying vec3 CAMERA_POSITION;
 varying vec3 CAMERA_DIRECTION;
 varying mat4 _CAMERA_MATRIX;
@@ -44,9 +46,13 @@ varying mat4 _INVERSE_PROJECTION;
 
 uniform sampler2D depth_texture : hint_depth_texture;
 
-
 struct Light {
 	vec3 pos;
+};
+
+struct RaymarchResult {
+	vec4 color;
+	float dist;
 };
 
 void vertex() {
@@ -57,55 +63,6 @@ void vertex() {
 	_CAMERA_MATRIX = INV_VIEW_MATRIX;
 	POSITION = vec4(VERTEX.xy, 1.0, 1.0);
 
-}
-
-float sd_sphere(vec3 pos, vec3 sphere_pos, float r) {
-	return length(pos) - r;
-}
-
-float sd_plane(vec3 pos, vec3 plane_pos) {
-	return pos.y - plane_pos.y;
-}
-
-float sdBox( vec3 p, vec3 b )
-{
-  vec3 q = abs(p) - b;
-  return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
-}
-
-vec2 smin( float a, float b, float k )
-{
-    float h = 1.0 - min( abs(a-b)/(4.0*k), 1.0 );
-    float w = h*h;
-    float m = w*0.5;
-    float s = w*k;
-    return (a<b) ? vec2(a-s,m) : vec2(b-s,1.0-m);
-}
-
-float DE(vec3 pos) {
-	vec3 z = pos;
-	float dr = 1.0;
-	float r = 10.0;
-	for (int i = 0; i < iterations ; i++) {
-		r = length(z);
-
-		if (r>bailout) break;
-
-		// convert to polar coordinates
-		float theta = acos(z.z/r);
-		float phi = atan(z.y,z.x);
-		dr =  pow(r, power-1.0)*power*dr + 1.0;
-
-		// scale and rotate the point
-		float zr = pow( r,power);
-		theta = theta*power;
-		phi = phi*power;
-
-		// convert back to cartesian coordinates
-		z = zr*vec3(sin(theta)*cos(phi), sin(phi)*sin(theta), cos(theta));
-		z+=pos;
-	}
-	return 0.5*log(r)*r/dr;
 }
 
 vec4 get_dist(vec3 pos) {
@@ -119,27 +76,49 @@ vec4 get_dist(vec3 pos) {
 		float width = widths[i];
 		float height = heights[i];
 		float depth = depths[i];
+		int operation = operations[i];
 		float minInfluence = minInfluences[i];
 
 		vec4 transformed4 = (matrix * vec4(pos, 1.0));
 		vec3 transformed = transformed4.xyz / transformed4.w;
 
 		float sdf;
-
+			
 		switch (type) {
+			// Sphere
 			case 0:
 				sdf = sd_sphere(transformed, vec3(0.0), width);
 				break;
+			// Cube
 			case 1:
-				sdf = sdBox(transformed, vec3(width, height, depth));
+				sdf = sd_box(transformed, vec3(width, height, depth));
+				break;
+			// Mandelbulb
+			case 2:
+				sdf = DE(transformed, iterations, bailout, power);
+				break;
+			// Capped Cone
+			case 3:
+				sdf = sd_capped_cone(transformed, vec3(0.0, height, 0.0), vec3(0.0, -height, 0.0), width, width * 2.0);
 				break;
 		};
-
-		vec2 _min = smin(sum, sdf, minInfluence);
+		
+		vec2 _min;
+		
+		switch (operation) {
+			case 0:
+				_min = s_union(sum, sdf, minInfluence);
+				break;
+			case 1:
+				_min = vec2(s_intersection(sum, sdf, minInfluence));
+				break;
+			case 2:
+				_min = vec2(s_subtraction(sum, sdf, minInfluence));
+				break;
+		}
+		
 		if (color == vec3(-1.0)) {
-
 			color = colors[i];
-
 		} else {
 			color = mix(color, colors[i], _min.y);
 		}
@@ -163,8 +142,6 @@ vec3 get_normal(vec3 pos) {
 	return normalize(curr_dist - vec3(x, y, z));
 }
 
-
-
 Light create_light(vec3 pos) {
 
 	Light light;
@@ -174,7 +151,7 @@ Light create_light(vec3 pos) {
 	return light;
 }
 
-vec4 RayMarch(vec3 ro, vec3 rd) {
+RaymarchResult RayMarch(vec3 ro, vec3 rd) {
 
 	float dist_marched = 0.0;
 	const float min_dist = 0.001;
@@ -195,8 +172,10 @@ vec4 RayMarch(vec3 ro, vec3 rd) {
 		}
 
 	}
+	
+	RaymarchResult result = RaymarchResult(vec4(result_color, 1.0), dist_marched);
 
-	return vec4(result_color, dist_marched);
+	return result;
 
 }
 
@@ -219,8 +198,6 @@ float get_light(vec3 pos) {
 }
 
 float get_shadow(vec3 pos) {
-	
-	
 	float totalResult = 0.0;
 	
 	for (int i = 0; i < lightsCount; i++) {
@@ -229,15 +206,13 @@ float get_shadow(vec3 pos) {
 		
 		vec3 toLight = light.pos - pos;
 		vec3 dir = normalize(toLight);
-		vec4 march_result = RayMarch(pos, dir);
-		float march = march_result.w;
+		RaymarchResult march_result = RayMarch(pos, dir);
+		float march = march_result.dist;
 		totalResult = max(float(march * march > dot(toLight, toLight)), totalResult);
 	}
 	
 	return totalResult * shadow_intensity;
 }
-
-
 
 void fragment() {
 
@@ -257,8 +232,8 @@ void fragment() {
 
 	vec3 ro = CAMERA_POSITION;
 	vec3 rd = rd4;
-	vec4 march_result = RayMarch(ro, rd);
-	float dist_marched = march_result.w;
+	RaymarchResult march_result = RayMarch(ro, rd);
+	float dist_marched = march_result.dist;
 	float march_percent = dist_marched / 4000.0;
 	
 	if (dist_marched > max_dist || march_percent > linear_depth) {
@@ -268,11 +243,11 @@ void fragment() {
 	vec3 rayPos = ro + rd * dist_marched;
 
 
-	vec3 col = march_result.xyz;
+	vec4 col = march_result.color;
 
 	if (lightning) {
 		float light = max(get_light(rayPos), 0.05);
-		col *= light;
+		col *= light * light_intensity;
 	}
 
 	if (shadows) {
@@ -280,8 +255,5 @@ void fragment() {
 		col *= shadow;
 	}
 	
-	ALBEDO.xyz = vec3(col);
-
-	//ALBEDO.xyz = mix((vec3(19, 0, 90)) / 255.0, vec3(3, 201, 136) / 255.0, col.x);
-
+	ALBEDO.xyz = vec3(col.xyz);
 }

@@ -1,7 +1,7 @@
 [gd_scene load_steps=11 format=3 uid="uid://cll8b2q24o0v2"]
 
 [ext_resource type="Script" path="res://Scripts/FPSCamera.gd" id="1_56758"]
-[ext_resource type="Shader" path="res://Raymarcher.gdshader" id="2_o5ld0"]
+[ext_resource type="Shader" path="res://Shaders/Raymarcher.gdshader" id="2_o5ld0"]
 [ext_resource type="Script" path="res://Scripts/Raymarcher_Manager.gd" id="3_23ifp"]
 [ext_resource type="Script" path="res://Scripts/Shape.gd" id="4_7gn8h"]
 
@@ -10,13 +10,13 @@ render_priority = 0
 shader = ExtResource("2_o5ld0")
 shader_parameter/shapeCount = 2
 shader_parameter/lightsCount = 3
-shader_parameter/widths = [0.459973, 0.35544]
-shader_parameter/heights = [0.459973, 0.35544]
-shader_parameter/depths = [0.531688, 0.35544]
-shader_parameter/types = [1, 0]
-shader_parameter/matrices = [Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.52401, -1.18916, -1.47202), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.392499, -1.2332, 0.469251)]
+shader_parameter/widths = [0.35544, 0.459973]
+shader_parameter/heights = [0.35544, 0.459973]
+shader_parameter/depths = [0.35544, 0.531688]
+shader_parameter/types = [0, 1]
+shader_parameter/matrices = [Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.392499, -1.2332, 0.469251), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.52401, -1.18916, -1.47202)]
 shader_parameter/minInfluences = [0.001, 0.001]
-shader_parameter/colors = [Color(0.137255, 1, 0, 1), Color(1.58831e-06, 0.853326, 0.267508, 1)]
+shader_parameter/colors = [Color(1.58831e-06, 0.853326, 0.267508, 1), Color(0.137255, 1, 0, 1)]
 shader_parameter/lights = [Vector3(0.197124, 2.66673, -2.46539), Vector3(-3.00741, 0.489495, 3.72185), Vector3(3.70155, 2.01648, 0.536891)]
 shader_parameter/max_dist = 100.35
 shader_parameter/max_steps = 190
@@ -96,6 +96,7 @@ mesh = SubResource("BoxMesh_0b0f1")
 [node name="Shape" type="Node3D" parent="."]
 transform = Transform3D(0.35544, 0, 0, 0, 0.35544, 0, 0, 0, 0.35544, -0.392499, 1.2332, -0.469251)
 script = ExtResource("4_7gn8h")
+operation = null
 min_influence = 0.001
 color = Color(1.58831e-06, 0.853326, 0.267508, 1)
 
@@ -103,6 +104,7 @@ color = Color(1.58831e-06, 0.853326, 0.267508, 1)
 transform = Transform3D(0.459973, 0, 0, 0, 0.459973, 0, 0, 0, 0.531688, 1.52401, 1.18916, 1.47202)
 script = ExtResource("4_7gn8h")
 type = 1
+operation = null
 min_influence = 0.001
 color = Color(0.137255, 1, 0, 1)
 

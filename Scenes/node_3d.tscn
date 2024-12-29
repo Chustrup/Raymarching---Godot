@@ -1,31 +1,58 @@
-[gd_scene load_steps=8 format=3 uid="uid://c0gvpyha6j4j6"]
+[gd_scene load_steps=18 format=3 uid="uid://c0gvpyha6j4j6"]
 
-[ext_resource type="Shader" path="res://Raymarcher.gdshader" id="2_6r3xl"]
+[ext_resource type="Shader" path="res://Shaders/Raymarcher.gdshader" id="2_6r3xl"]
 [ext_resource type="Script" path="res://Scripts/FPSCamera.gd" id="2_ntf1b"]
 [ext_resource type="Script" path="res://Scripts/Raymarcher_Manager.gd" id="4_3see7"]
-[ext_resource type="PackedScene" uid="uid://dxo5s72rygej" path="res://Scenes/lavalamp-edit.tscn" id="5_4twas"]
+[ext_resource type="PackedScene" uid="uid://dg06jct0t80e8" path="res://lavalamp.obj" id="5_s4k1e"]
+[ext_resource type="Script" path="res://Scenes/lava_ball_component.gd" id="5_vtrpy"]
 [ext_resource type="Script" path="res://Scripts/Shape.gd" id="5_wkhgb"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_eadcw"]
+metallic = 0.78
+metallic_specular = 0.86
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j1lv2"]
+resource_name = "Glass"
+cull_mode = 1
+depth_draw_mode = 1
+albedo_color = Color(0.672642, 0.888865, 0, 1)
+metallic_specular = 0.21
+roughness = 0.09
+emission = Color(0, 0.811765, 0, 1)
+emission_energy_multiplier = 1.06
+backlight = Color(0, 0.6, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bbigy"]
+cull_mode = 1
+albedo_color = Color(5.2643e-08, 0.0558973, 0.0331301, 1)
+backlight_enabled = true
+backlight = Color(1, 1, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_4dg4h"]
+material = SubResource("StandardMaterial3D_bbigy")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_0gu2y"]
 render_priority = 0
 shader = ExtResource("2_6r3xl")
-shader_parameter/shapeCount = 3
+shader_parameter/shapeCount = 7
 shader_parameter/lightsCount = 1
-shader_parameter/widths = [2.06723, 1.27644, 1.17616]
-shader_parameter/heights = [1.0, 1.27644, 1.17616]
-shader_parameter/depths = [1.0, 1.27644, 1.17616]
-shader_parameter/types = [1, 0, 0]
-shader_parameter/matrices = [Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.8468, -10.5562, -0.0411151), Transform3D(0.458186, -0.888856, 0, 0.888856, 0.458186, 0, 0, 0, 1, 1.00855, -14.0647, -2.69687), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.65765, -12.4005, -0.0938329)]
-shader_parameter/minInfluences = [0.001, 1.0, 0.806]
-shader_parameter/colors = [Color(0.641446, 0.831901, 0.976375, 1), Color(0.65098, 0.564706, 0.196078, 1), Color(0, 0.528933, 0.249637, 1)]
-shader_parameter/lights = [Vector3(16.7241, 19.9795, 0)]
+shader_parameter/widths = [3.34, 3.17, 0.97, 0.56, 2.6, 1.61, 3.21985]
+shader_parameter/heights = [0.997246, 9.03949, 9.03949, 9.03949, 9.03949, 0.997246, 12.517]
+shader_parameter/depths = [1.2709, 0.584934, 0.584934, 0.584934, 0.584934, 1.2709, 6.71546]
+shader_parameter/types = [0, 0, 0, 0, 0, 0, 3]
+shader_parameter/matrices = [Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.86834, -35.6121, -2.06676), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.02, -25.1046, 2.24), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.81, -24.3794, 2.24), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.02, -25.8104, 2.98), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6705, -33.0183, 1.84106), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.835654, -32.7862, 0.155846), Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.142509, -32.3866, 1.69317)]
+shader_parameter/minInfluences = [1.321, 0.781, 0.781, 0.781, 0.781, 1.321, 0.23]
+shader_parameter/colors = [Color(0, 0.694621, 0.135324, 1), Color(0, 0.694621, 0.135324, 1), Color(0, 0.694621, 0.135324, 1), Color(0, 0.694621, 0.135324, 1), Color(0, 0.694621, 0.135324, 1), Color(0, 0.694621, 0.135324, 1), Color(0.641446, 0.831901, 0.976375, 1)]
+shader_parameter/lights = [Vector3(3.41373, 16.9987, -2.45412)]
+shader_parameter/operations = [0, 0, 0, 0, 0, 0, 1]
 shader_parameter/max_dist = 100.0
 shader_parameter/max_steps = 100
 shader_parameter/lightning = true
 shader_parameter/shadows = false
 shader_parameter/shadow_intensity = 0.1
 shader_parameter/shadow_color = null
-shader_parameter/light_intensity = 0.1
+shader_parameter/light_intensity = 6.4
 shader_parameter/light_color = null
 shader_parameter/shape_color = null
 shader_parameter/iterations = 1
@@ -38,43 +65,249 @@ material = SubResource("ShaderMaterial_0gu2y")
 flip_faces = true
 size = Vector2(2, 2)
 
+[sub_resource type="Animation" id="Animation_irwdu"]
+resource_name = "lavalamp"
+length = 10.11
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Node3D2:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 8.16667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(4.07969, 35.1153, -4.11992), Vector3(4.07969, 35.1153, -4.11992)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Node3D2:rotation")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 9.96667),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(0.226893, 0, 0), Vector3(0, 5.93412, 0)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Node3D2/Camera3D:fov")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0, 3.43333),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [17.4, 50.9]
+}
+
+[sub_resource type="Animation" id="Animation_4j61q"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Node3D2:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(0, 0, 0)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Node3D2:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(4.07969, 35.1153, -4.11992)]
+}
+tracks/2/type = "value"
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/path = NodePath("Node3D2/Camera3D:fov")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [50.9]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_jt4nd"]
+_data = {
+"RESET": SubResource("Animation_4j61q"),
+"lavalamp": SubResource("Animation_irwdu")
+}
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x08x8"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_r5lqw"]
+material = SubResource("StandardMaterial3D_x08x8")
+size = Vector2(100000, 10000)
+
 [node name="Node3D" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.50708, -1.78977, 1.71016)
 
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.14104)
-fov = 45.0
+[node name="Shape2" type="Node3D" parent="."]
+transform = Transform3D(3.34, 0, 0, 0, 0.997246, 0, 0, 0, 1.2709, -1.86834, 35.6121, 2.06676)
+script = ExtResource("5_wkhgb")
+min_influence = 1.321
+color = Color(0, 0.694621, 0.135324, 1)
+order = 1
+
+[node name="LavaBallComponent" type="Node" parent="Shape2"]
+script = ExtResource("5_vtrpy")
+amplitude = Vector3(2.41, 8.72, 2.53)
+frequency = Vector3(1, 0.89, 1)
+offset = Vector3(-4.18, 31.02, -0.36)
+time_offset = 9.08
+scale = 3.34
+
+[node name="Shape7" type="Node3D" parent="."]
+transform = Transform3D(1.61, 0, 0, 0, 0.997246, 0, 0, 0, 1.2709, -0.835654, 32.7862, -0.155846)
+script = ExtResource("5_wkhgb")
+min_influence = 1.321
+color = Color(0, 0.694621, 0.135324, 1)
+order = 1
+
+[node name="LavaBallComponent" type="Node" parent="Shape7"]
+script = ExtResource("5_vtrpy")
+amplitude = Vector3(2.41, 12.46, 2.53)
+frequency = Vector3(1.41, 1.07, 1)
+offset = Vector3(0.2, 31.02, -0.2)
+time_offset = 10.92
+scale = 1.61
+
+[node name="Shape4" type="Node3D" parent="."]
+transform = Transform3D(0.97, 0, 0, 0, 9.03949, 0, 0, 0, 0.584934, 2.81, 24.3794, -2.24)
+script = ExtResource("5_wkhgb")
+min_influence = 0.781
+color = Color(0, 0.694621, 0.135324, 1)
+order = 1
+
+[node name="LavaBallComponent" type="Node" parent="Shape4"]
+script = ExtResource("5_vtrpy")
+amplitude = Vector3(0, 9.5, 0)
+frequency = Vector3(1, 0.85, 1)
+offset = Vector3(2.81, 31.02, -2.24)
+time_offset = 12.77
+scale = 0.97
+
+[node name="Shape6" type="Node3D" parent="."]
+transform = Transform3D(2.6, 0, 0, 0, 9.03949, 0, 0, 0, 0.584934, 2.6705, 33.0183, -1.84106)
+script = ExtResource("5_wkhgb")
+min_influence = 0.781
+color = Color(0, 0.694621, 0.135324, 1)
+order = 1
+
+[node name="LavaBallComponent" type="Node" parent="Shape6"]
+script = ExtResource("5_vtrpy")
+amplitude = Vector3(0.5, 10.98, 0.5)
+frequency = Vector3(3.56, 0.65, 3.25)
+offset = Vector3(2.81, 31.02, -2.24)
+time_offset = 12.43
+scale = 2.6
+
+[node name="Shape5" type="Node3D" parent="."]
+transform = Transform3D(0.56, 0, 0, 0, 9.03949, 0, 0, 0, 0.584934, 0.02, 25.8104, -2.98)
+script = ExtResource("5_wkhgb")
+min_influence = 0.781
+color = Color(0, 0.694621, 0.135324, 1)
+order = 1
+
+[node name="LavaBallComponent" type="Node" parent="Shape5"]
+script = ExtResource("5_vtrpy")
+amplitude = Vector3(0, 9.5, 0)
+frequency = Vector3(1, 0.83, 1)
+offset = Vector3(0.02, 31.02, -2.98)
+time_offset = 13.72
+scale = 0.56
+
+[node name="Shape3" type="Node3D" parent="."]
+transform = Transform3D(3.17, 0, 0, 0, 9.03949, 0, 0, 0, 0.584934, 0.02, 25.1046, -2.24)
+script = ExtResource("5_wkhgb")
+min_influence = 0.781
+color = Color(0, 0.694621, 0.135324, 1)
+order = 1
+
+[node name="LavaBallComponent" type="Node" parent="Shape3"]
+script = ExtResource("5_vtrpy")
+amplitude = Vector3(0, 9.5, 0)
+frequency = Vector3(1, 0.1, 1)
+offset = Vector3(0.02, 31.02, -2.24)
+time_offset = 1.95
+scale = 3.17
+
+[node name="Base" type="Node3D" parent="."]
+transform = Transform3D(3.21985, 0, 0, 0, 12.517, 0, 0, 0, 6.71546, 0.142509, 32.3866, -1.69317)
+script = ExtResource("5_wkhgb")
+type = 3
+operation = 1
+min_influence = 0.23
+color = Color(0.641446, 0.831901, 0.976375, 1)
+order = 11
+
+[node name="OmniLight3D" type="OmniLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.41373, 16.9987, -2.45412)
+light_color = Color(0.434999, 1, 0.318751, 1)
+light_energy = 0.0
+omni_range = 50.397
+omni_attenuation = 0.192
+
+[node name="lavalamp2" parent="." instance=ExtResource("5_s4k1e")]
+transform = Transform3D(7.41167, 0, 0, 0, 7.41167, 0, 0, 0, 7.41167, 3.713, 0.015564, -3.51973)
+
+[node name="Circle" parent="lavalamp2" index="0"]
+material_override = SubResource("StandardMaterial3D_eadcw")
+
+[node name="Circle_001" parent="lavalamp2" index="1"]
+material_override = SubResource("StandardMaterial3D_j1lv2")
+transparency = 0.82
+
+[node name="Node3D" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0795364, 9.53674e-07, 0.140579)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(2362.72, 0, 0, 0, 2362.05, 0, 0, 0, 2362.72, 0, 0, 0)
+cast_shadow = 0
+lod_bias = 0.001
+mesh = SubResource("SphereMesh_4dg4h")
+
+[node name="Node3D2" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.07969, 35.1153, -4.11992)
+
+[node name="Camera3D" type="Camera3D" parent="Node3D2"]
+transform = Transform3D(1, 0, 0, 0, 0.965016, 0.262189, 0, -0.262189, 0.965016, 0, 14.79, 86.156)
+fov = 50.9
 script = ExtResource("2_ntf1b")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Camera3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D2/Camera3D"]
 transform = Transform3D(0.987119, 0, 0, 0, 0.987119, 0, 0, 0, 0.987119, -0.171938, -0.043611, 0.23791)
 cast_shadow = 0
 extra_cull_margin = 3387.39
 mesh = SubResource("QuadMesh_wkjtq")
-skeleton = NodePath("../..")
+skeleton = NodePath("../../..")
 script = ExtResource("4_3see7")
 
-[node name="Shape" type="Node3D" parent="."]
-transform = Transform3D(2.06723, 0, 0, 0, 1, 0, 0, 0, 1, 10.8468, 10.5562, 0.0411151)
-script = ExtResource("5_wkhgb")
-type = 1
-min_influence = 0.001
-color = Color(0.641446, 0.831901, 0.976375, 1)
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Node3D2/Camera3D"]
+root_node = NodePath("../../..")
+libraries = {
+"": SubResource("AnimationLibrary_jt4nd")
+}
 
-[node name="Shape2" type="Node3D" parent="."]
-transform = Transform3D(0.584846, 1.13457, 0, -1.13457, 0.584846, 0, 0, 0, 1.27644, 12.0394, 7.34071, 2.69687)
-script = ExtResource("5_wkhgb")
-min_influence = 1.0
-color = Color(0.65098, 0.564706, 0.196078, 1)
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_r5lqw")
 
-[node name="Shape3" type="Node3D" parent="."]
-transform = Transform3D(1.17616, 0, 0, 0, 1.17616, 0, 0, 0, 1.17616, 6.65765, 12.4005, 0.0938329)
-script = ExtResource("5_wkhgb")
-min_influence = 0.806
-color = Color(0, 0.528933, 0.249637, 1)
-
-[node name="lavalamp" parent="." instance=ExtResource("5_4twas")]
-transform = Transform3D(4.49432, 0, 0, 0, 4.49432, 0, 0, 0, 4.49432, 0, 0, 0.1)
-
-[node name="OmniLight3D" type="OmniLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.7241, 19.9795, 0)
+[editable path="lavalamp2"]

@@ -4,17 +4,32 @@ class_name Shape extends Node3D
 enum ShapeType {
 	Sphere,
 	Cube,
-	Cylinder
+	Mandelbulb,
+	CappedCone
+}
+
+enum OperationType {
+	Union,
+	Intersection,
+	Difference
 }
 
 @export
 var type: ShapeType = ShapeType.Sphere
 
-@export_range(0.001, 1.0)
+@export
+var operation: OperationType = OperationType.Union
+
+@export_range(0.001, 3.0)
 var min_influence: float
 
 @export 
 var color: Color = Color.WHITE
+
+@export
+var order: int = 0
+
+
 
 var width: float:
 	get:

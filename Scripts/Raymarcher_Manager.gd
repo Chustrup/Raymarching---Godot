@@ -7,7 +7,6 @@ var light_nodes: Array[Light3D] = []
 
 var last_update_time: float = 0.0
 
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	
 	var root = get_tree().edited_scene_root
@@ -41,9 +40,6 @@ func _on_remove_node(node: Node):
 		light_nodes.remove_at(index)
 		
 func _process(delta):
-	
-	var start_time = Time.get_ticks_msec()  # Tempo inicial em milissegundos
-	
 	var widths = []
 	var heights = []
 	var depths = []
@@ -51,6 +47,9 @@ func _process(delta):
 	var types = []
 	var min_influcenes = []
 	var colors = []
+	var operations = []
+	
+	shape_nodes.sort_custom(func(a,b): return a.order < b.order)
 	
 	for shape in shape_nodes:
 		widths.append(shape.width)
@@ -60,7 +59,7 @@ func _process(delta):
 		colors.append(shape.color)
 		matrices.append(shape.matrix)
 		types.append(int(shape.type))
-
+		operations.append(int(shape.operation))
 
 	shader.set_shader_parameter("shapeCount", len(shape_nodes))
 	shader.set_shader_parameter("widths", widths)
@@ -68,6 +67,7 @@ func _process(delta):
 	shader.set_shader_parameter("depths", depths)
 	shader.set_shader_parameter("minInfluences", min_influcenes)
 	shader.set_shader_parameter("colors", colors)
+	shader.set_shader_parameter("operations", operations)
 
 	shader.set_shader_parameter("matrices", matrices)
 	shader.set_shader_parameter("types", types)
@@ -75,9 +75,7 @@ func _process(delta):
 	shader.set_shader_parameter("lights", light_nodes.map(func(light): return light.position))
 	shader.set_shader_parameter("lightsCount", len(light_nodes))
 	
-	var end_time = Time.get_ticks_msec()  # Tempo final em milissegundos
-	last_update_time = end_time - start_time
-	print("Tempo de atualização: %sms" % last_update_time)
+	
 	
 	
 		
